@@ -13,6 +13,7 @@ const Balance = () => {
 
     const exchange = useSelector(state => state.exchange.contract)
     const exchangeBalances = useSelector(state => state.exchange.balances)
+    const transferInProgress = useSelector(state => state.exchange.transferInProgress)
 
     const tokens = useSelector(state => state.tokens.contracts)
 
@@ -32,11 +33,13 @@ const Balance = () => {
     //Step 2: send notification to app for pending transfer
     //Step 3: BC confirmed the transfer
     //Step 4: update app balance
+    //Step 5: handle failed
 
     const depositHandler = (e, token) => {
         e.preventDefault()
         if (token.address === tokens[0].address) {
             transferTokens(provider, exchange, 'deposit', token, token1TransferAmount, dispatch)
+            settoken1TransferAmount(0)
         }
     }
 
@@ -46,7 +49,7 @@ const Balance = () => {
         if (exchange && tokens[0] && tokens[1] && account) {
             loadBalances(exchange, tokens, account, dispatch)
         }
-    }, [exchange, tokens, account])
+    }, [exchange, tokens, account, transferInProgress])
 
     return (
         <div className='component exchange__transfers'>
@@ -79,7 +82,9 @@ const Balance = () => {
 
                 <form onSubmit={(e) => depositHandler(e, tokens[0])}>
                     <label htmlFor="token0">{symbols && symbols[0]} Amount</label>
-                    <input type="text" id='token0' placeholder='0.0000' onChange={(e) => amountHandler(e, tokens[0])} />
+                    <input type="text" id='token0' placeholder='0.0000' onChange={(e) => amountHandler(e, tokens[0])}
+                        value={token1TransferAmount === 0 ? '' : token1TransferAmount}
+                    />
 
                     <button className='button' type='submit'>
                         <span>Deposit</span>

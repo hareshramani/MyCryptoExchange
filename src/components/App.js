@@ -8,7 +8,8 @@ import {
     loadNetwork,
     loadAccount,
     loadTokens,
-    loadExchange
+    loadExchange,
+    subscribeToEvents
 } from '../store/interactions';
 
 import Navbar from './Navbar';
@@ -47,6 +48,9 @@ function App() {
         const exchangeConfig = config[chainId].exchange;
         const exchange = await loadExchange(provider, exchangeConfig.address, dispatch)
         console.log(exchange.address)
+
+        // Listen To Events
+        subscribeToEvents(exchange, dispatch)
     }
 
 
