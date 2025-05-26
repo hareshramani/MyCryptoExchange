@@ -48,6 +48,12 @@ export const loadExchange = async (provider, address, dispatch) => {
     return exchange;
 }
 
+const subscribeToEvents = (exchange, dispatch) => {
+    exchange.on('Deposit', (token, user, amount, balance, event) => {
+        dispatch({ type: 'TRANSFER_SUCESS', event })
+    })
+}
+
 //Load user balances (waller & exchange balances)
 export const loadBalances = async (exchange, tokens, account, dispatch) => {
     let balance = ethers.utils.formatUnits(await tokens[0].balanceOf(account), 18)
@@ -62,4 +68,16 @@ export const loadBalances = async (exchange, tokens, account, dispatch) => {
     balance = ethers.utils.formatUnits(await exchange.balanceOf(tokens[1].address, account), 18)
     dispatch({ type: 'EXCHANGE_TOKEN_2_BALANCE_LOADED', balance })
 
+}
+// Transfer Tokens (Deposit & Withdraw)
+export const transferTokens = async (provider, exchange, tranferType, token, amout, dispatch) => {
+    let transaction
+    dispatch({ type: 'TRANSFER_REQUEST' })
+    const signer = await provider.getSigner()
+    const amountToTransfer = ethers.utils.parseUnits(amout.toString(), 18)
+    transaction = await token.connect(signer).approve(exchange.address, amountToTransfer)
+    await transaction.wait();
+
+    transaction = await exchange.connect(signer).depositToken(token.address, amountToTransfer)
+    await transaction.wait();
 }

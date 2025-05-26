@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import dapp from '../assets/dapp.svg'
-import { loadBalances } from '../store/interactions';
+import { loadBalances, transferTokens } from '../store/interactions';
 import { exchange, tokens } from '../store/reducers';
 const Balance = () => {
 
     const [token1TransferAmount, settoken1TransferAmount] = useState(0)
 
     const dispatch = useDispatch()
+    const provider = useSelector(state => state.provider.connection)
     const account = useSelector(state => state.provider.account)
 
     const exchange = useSelector(state => state.exchange.contract)
@@ -25,6 +26,21 @@ const Balance = () => {
         }
         console.log(token1TransferAmount)
     }
+
+
+    //Step 1: transfer intiated
+    //Step 2: send notification to app for pending transfer
+    //Step 3: BC confirmed the transfer
+    //Step 4: update app balance
+
+    const depositHandler = (e, token) => {
+        e.preventDefault()
+        if (token.address === tokens[0].address) {
+            transferTokens(provider, exchange, 'deposit', token, token1TransferAmount, dispatch)
+        }
+    }
+
+
 
     useEffect(() => {
         if (exchange && tokens[0] && tokens[1] && account) {
@@ -61,12 +77,12 @@ const Balance = () => {
 
                 </div>
 
-                <form>
-                    <label htmlFor="token0"></label>
+                <form onSubmit={(e) => depositHandler(e, tokens[0])}>
+                    <label htmlFor="token0">{symbols && symbols[0]} Amount</label>
                     <input type="text" id='token0' placeholder='0.0000' onChange={(e) => amountHandler(e, tokens[0])} />
 
                     <button className='button' type='submit'>
-                        <span></span>
+                        <span>Deposit</span>
                     </button>
                 </form>
             </div>
