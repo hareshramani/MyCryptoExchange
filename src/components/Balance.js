@@ -44,11 +44,23 @@ const Balance = () => {
     const depositHandler = (e, token) => {
         e.preventDefault()
         if (token.address === tokens[0].address) {
-            transferTokens(provider, exchange, 'deposit', token, token1TransferAmount, dispatch)
+            transferTokens(provider, exchange, 'Deposit', token, token1TransferAmount, dispatch)
             settoken1TransferAmount(0)
         }
         if (token.address === tokens[1].address) {
-            transferTokens(provider, exchange, 'deposit', token, token2TransferAmount, dispatch)
+            transferTokens(provider, exchange, 'Deposit', token, token2TransferAmount, dispatch)
+            settoken2TransferAmount(0)
+        }
+    }
+
+    const withdrawHandler = (e, token) => {
+        e.preventDefault()
+        if (token.address === tokens[0].address) {
+            transferTokens(provider, exchange, 'Withdraw', token, token1TransferAmount, dispatch)
+            settoken1TransferAmount(0)
+        }
+        if (token.address === tokens[1].address) {
+            transferTokens(provider, exchange, 'Withdraw', token, token2TransferAmount, dispatch)
             settoken2TransferAmount(0)
         }
     }
@@ -101,7 +113,7 @@ const Balance = () => {
 
                 </div>
 
-                <form onSubmit={(e) => depositHandler(e, tokens[0])}>
+                <form onSubmit={isDeposit ? (e) => depositHandler(e, tokens[0]) : (e) => withdrawHandler(e, tokens[0])}>
                     <label htmlFor="token0">{symbols && symbols[0]} Amount</label>
                     <input type="text" id='token0' placeholder='0.0000' onChange={(e) => amountHandler(e, tokens[0])}
                         value={token1TransferAmount === 0 ? '' : token1TransferAmount}
@@ -133,7 +145,7 @@ const Balance = () => {
                     </p>
                 </div>
 
-                <form onSubmit={(e) => depositHandler(e, tokens[1])}>
+                <form onSubmit={isDeposit ? (e) => depositHandler(e, tokens[1]) : (e) => withdrawHandler(e, tokens[1])}>
                     <label htmlFor="token1">{symbols && symbols[1]} Amount</label>
                     <input type="text" id='token1' placeholder='0.0000' onChange={(e) => amountHandler(e, tokens[1])}
                         value={token2TransferAmount === 0 ? '' : token2TransferAmount}
